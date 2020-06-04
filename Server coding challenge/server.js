@@ -4,26 +4,25 @@ const mongoose = require( 'mongoose' );
 const jsonParser = bodyParser.json();
 const { DATABASE_URL, PORT } = require( './config' );
 const morgan = require('morgan');
-const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const { Movies }= require("./models/movie-model");
 const { Actors }= require("./models/actor-model");
 app.use(morgan('dev'))
 app.use(jsonParser)
-
+const errorHandler = require('./middleware/errorHandler');
 /* 
     Your code goes here 
 */
 app.patch('/api/add-movie-actor/:movie_ID', function (req, res) {
-    let movie_ID = req.params;
+    let movie_ID = req.params.movie_ID;
     let {id, firstName, lastName} = req.body;
-
+    
     if (!id) {
         res.statusMessage = "Id is missing in the body of the request."
         return res.status(406).end();
     }
-
-    if (id !== movie_ID) {
+    
+    if (id !== Number(movie_ID)) {
         res.statusMessage = "id and movie_ID do not match"
         return res.status(409).end();
     }
@@ -34,13 +33,14 @@ app.patch('/api/add-movie-actor/:movie_ID', function (req, res) {
     }
 
     Movies
-    .getMovieById( {id: movie_ID})
+    .getMovieById( Number(id))
     .then((movie) => {
+        console.log(movie)
         if (movie.length == 0) {
             res.statusMessage = "Movie No found"
             return res.status(400).end()
         }
-
+        console.log(movie)
         Actors
         .getActorByName({firstName, lastName})
         .then((actor) => {
@@ -48,19 +48,23 @@ app.patch('/api/add-movie-actor/:movie_ID', function (req, res) {
                 res.statusMessage = "Actor no found"
                 return res.status(400).end()
             }
+            console.log(actor)
             Movies
-            addActorToMovieList( {movie_ID: actor.movie_ID}, {firstName: actor.firstName, lastName: actor.firstName} )    
+            addActorToMovieList( {movie_ID: movie.movie_ID}, {actors: actor} )
             .then((result) => {
-                
+                res.status(201).json(result);
             }).catch((err) => {
-                
+                res.statusMessage = err.message
+                return res.status(400).end()
             });
         }).catch((err) => {
-            
+            res.statusMessage = err.message
+            return res.status(400).end()
         });
         
     }).catch((err) => {
-        
+        res.statusMessage = err.message
+        return res.status(400).end()
     });
 })
 

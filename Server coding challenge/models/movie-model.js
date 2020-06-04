@@ -38,17 +38,18 @@ const Movies = {
                     throw new Error( err );
                 });
     },
-    getMovieById : function( query ){
+    getMovieById : function( id ){
+        console.log(id)
         return moviesCollection
-                .findOne( query )
+                .find( {movie_ID: id} )
                 .then( movie => {
                     return movie;
                 })
                 .catch( err => {
-                    throw new Error( err );
+                    return err;
                 });
     },
-    addActorToMovieList: function( query, update ){
+    addActorToMovieList: function( query, actors ) {
         return moviesCollection
                 .findOneAndUpdate( query, update )
                 .then( movie => {
