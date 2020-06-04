@@ -39,9 +39,6 @@ const Actors = {
                     throw new Error( err );
                 });
     }
-    /*
-        Your code goes here
-    */
 }
 
 module.exports = {

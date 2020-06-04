@@ -33,7 +33,7 @@ app.patch('/api/add-movie-actor/:movie_ID', function (req, res) {
     }
 
     Movies
-    .getMovieById( Number(id))
+    .getMovieById( Number(id) )
     .then((movie) => {
         console.log(movie)
         if (movie.length == 0) {
@@ -44,10 +44,6 @@ app.patch('/api/add-movie-actor/:movie_ID', function (req, res) {
         Actors
         .getActorByName({firstName, lastName})
         .then((actor) => {
-            if (actor.length == 0) {
-                res.statusMessage = "Actor no found"
-                return res.status(400).end()
-            }
             console.log(actor)
             Movies
             addActorToMovieList( {movie_ID: movie.movie_ID}, {actors: actor} )
